@@ -1,14 +1,47 @@
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 
 public record Shop<T extends Comparable<T>>(String name, Map<T, List<Integer>> assortment) {
-	
+
 	public void addProduct(T product) {
-		if(!assortment.containsKey(product)) {
+		if (!assortment.containsKey(product)) {
 			assortment.put(product, null);
 		}
 	}
-	public void rateProduct(T product, int rating) {
-		assortment.entrySet().stream().filter(b -> b.getKey().equals(product)).
+
+	public void rateProduct(T product, int rating) throws NoProductFoundException, InvalidRatingException {
+		if (!assortment.containsKey(product)) {
+			throw new NoProductFoundException();
+		}
+		if (rating < 0 || rating > 5) {
+			throw new InvalidRatingException();
+		}
+		List<Integer> ratings = assortment.get(product);
+		ratings.add(rating);
+	}
+
+	public Optional<T> getBestRatedProduct() {
+		T bestRatedProduct = null;
+		double bestAverageRating = 0;
+
+		for (Entry<T, List<Integer>> entry : assortment.entrySet()) {
+			T product = entry.getKey();
+			List<Integer> ratings = entry.getValue();
+
+			double totalRating = 0;
+			for (int rating : ratings) {
+				totalRating += rating;
+			}
+			double averageRating = totalRating / ratings.size();
+
+			if (averageRating > bestAverageRating) {
+				bestRatedProduct = product;
+				bestAverageRating = averageRating;
+			}
+		}
+
+		return Optional.ofNullable(bestRatedProduct);
 	}
 }
