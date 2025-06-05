@@ -1,0 +1,57 @@
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class ShopTest {
+
+    private Shop<String> shop;
+
+    @BeforeEach
+    void setUp() {
+        Map<String, List<Integer>> initialAssortment = new HashMap<>();
+        initialAssortment.put("Apple", new ArrayList<>(Arrays.asList(5, 4)));
+        initialAssortment.put("Banana", new ArrayList<>(Arrays.asList(3)));
+        shop = new Shop<>("Test Shop", initialAssortment);
+    }
+
+    @Test
+    void testAddProduct() {
+        shop.addProduct("Orange");
+        assertTrue(shop.assortment().containsKey("Orange"));
+        assertNull(shop.assortment().get("Orange"));  
+    }
+
+    @Test
+    void testRateProductSuccess() throws Exception {
+        shop.rateProduct("Apple", 3);
+        assertEquals(Arrays.asList(5, 4, 3), shop.assortment().get("Apple"));
+    }
+
+    @Test
+    void testRateProductNotFound() {
+        assertThrows(NoProductFoundException.class, () -> shop.rateProduct("Pear", 4));
+    }
+
+    @Test
+    void testRateProductInvalidRating() {
+        assertThrows(InvalidRatingException.class, () -> shop.rateProduct("Apple", -1));
+        assertThrows(InvalidRatingException.class, () -> shop.rateProduct("Apple", 6));
+    }
+
+    @Test
+    void testGetBestRatedProduct() {
+        Optional<String> bestProduct = shop.getBestRatedProduct();
+        assertTrue(bestProduct.isPresent());
+        assertEquals("Apple", bestProduct.get());
+    }
+
+    @Test
+    void testGetAllProductsByNaturalOrder() {
+        List<String> products = shop.getAllProductsByNaturalOrder();
+        List<String> expected = Arrays.asList("Apple", "Banana");
+        assertEquals(expected, products);  
+    }
+}
