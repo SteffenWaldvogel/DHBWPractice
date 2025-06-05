@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,4 +47,15 @@ public record Shop<T extends Comparable<T>>(String name, Map<T, List<Integer>> a
 
 		return Optional.ofNullable(bestRatedProduct);
 	}
+	
+	public List<T> getAllProductsByNaturalOrder(){
+		List<T> allProducts = new ArrayList<>();
+		for(T product : assortment.keySet()) {
+			allProducts.add(product);
+		}
+		Collections.sort(allProducts);
+		return allProducts;
+		
+	}
+	
 }
